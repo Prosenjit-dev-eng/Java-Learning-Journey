@@ -1,0 +1,10 @@
+# Default ignored files
+/../../Challenge83./.idea/shelf/
+/../../Challenge83./.idea/workspace.xml
+# Ignored default folder with query files
+/../../Challenge83./.idea/queries/
+# Datasource local storage ignored files
+/../../Challenge83./.idea/dataSources/
+/../../Challenge83./.idea/dataSources.local.xml
+# Editor-based HTTP Client requests
+/../../Challenge83./.idea/httpRequests/

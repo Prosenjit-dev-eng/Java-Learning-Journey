@@ -1,4 +1,3 @@
-package Task-8;
 
 public class Car{
     int noOfWheels, noOfDoors, maxSpeed;

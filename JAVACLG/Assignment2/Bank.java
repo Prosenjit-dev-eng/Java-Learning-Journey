@@ -1,278 +1,180 @@
 
-// 5. Each customer of a bank has customer id, name, and current loan amount and phone number. One 
-// can change the attributes like name, phone number. A customer may ask for loan of certain amount. 
-// It is granted provided the sum of current loan amount and asked amount does not exceed credit limit 
-// (fixed amount for all customer). A customer can be a privileged customer. For such customers credit 
-// limit is higher. Once a loan is sanctioned necessary updates should be made. Any type of customer 
-// should be able to find his credit limit, current loan amount and amount of loan (s)he can seek.  No 
-// customer can change customer id once created. Print customer name when the object is printed by 
-// toString() method. Design and implement the classes. Show the working through a menu driven user interface.
-
+//4. Every bank account holds an account no and a calculateInterest method. A customer can have a 
+// “SavingsAccount”  and/or a  “CurrentAccount”.  For current  account,  there  is  a  method  called 
+// displayOverdraftAmount(). Different accounts can have different interest rates. User should be able 
+// to verify the existence of an account, adding new account and displaying all accounts. Implement 
+// appropriate objects utilizing inheritance and show its behavior from the parent class. 
+// Name: Prosenjit Hawlader
+// Roll: 002410501066
 import java.util.Scanner;
-import java.util.HashMap;
 
-abstract class Customer {
-    private final String customerId;  // Cannot be changed once created
-    private String name;
-    private String phoneNumber;
-    private float currentLoanAmount;
-    private static final float NORMAL_CREDIT_LIMIT = 50000;
-    private static final float PRIVILEGED_CREDIT_LIMIT = 100000;
+abstract class Account {
+    String acno;
+    float interest_rate;
+    float balance;
 
-    Customer(String customerId, String name, String phoneNumber) {
-        this.customerId = customerId;
-        this.name = name;
-        this.phoneNumber = phoneNumber;
-        this.currentLoanAmount = 0;
+    Account(String acno) {
+        this.acno=acno;
+        interest_rate=6;
+        balance=0;
+    }
+    
+    float calculateInterest() {
+        return interest_rate*balance/100;
     }
 
-    public String getCustomerId() {
-        return customerId;
+    abstract void displayAccountDetails();
+
+}
+
+class CurrentAccount extends Account {
+
+    float overdraftAmount;
+
+    CurrentAccount(String acno) {
+        super(acno);
+        overdraftAmount=10000;
+        interest_rate=0;
     }
 
-    public String getName() {
-        return name;
+    float displayOverdraftAmount() {
+        return overdraftAmount;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public float getCurrentLoanAmount() {
-        return currentLoanAmount;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-        System.out.println("Name updated successfully.");
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-        System.out.println("Phone number updated successfully.");
-    }
-
-    // Abstract method for credit limit
-    abstract float getCreditLimit();
-
-    // Calculate remaining loan available
-    public float getRemainingLoanAvailable() {
-        return getCreditLimit() - currentLoanAmount;
-    }
-
-    // Request loan
-    public boolean requestLoan(float loanAmount) {
-        if (loanAmount <= 0) {
-            System.out.println("Loan amount must be positive.");
-            return false;
-        }
-
-        if (currentLoanAmount + loanAmount > getCreditLimit()) {
-            System.out.println("Loan request denied. Exceeds credit limit.");
-            System.out.println("Current loan: " + currentLoanAmount + 
-                             " | Requested: " + loanAmount + 
-                             " | Credit limit: " + getCreditLimit());
-            return false;
-        }
-
-        currentLoanAmount += loanAmount;
-        System.out.println("Loan of " + loanAmount + " has been sanctioned.");
-        return true;
-    }
-
-    // Display customer details
-    public void displayDetails() {
-        System.out.println("\n----- Customer Details -----");
-        System.out.println("Customer ID: " + customerId);
-        System.out.println("Name: " + name);
-        System.out.println("Phone: " + phoneNumber);
-        System.out.println("Current Loan Amount: " + currentLoanAmount);
-        System.out.println("Credit Limit: " + getCreditLimit());
-        System.out.println("Remaining Loan Available: " + getRemainingLoanAvailable());
-        System.out.println("------------------------------");
-    }
-
-    @Override
-    public String toString() {
-        return name;
+    void displayAccountDetails() {
+        System.out.println("-----Current Account Details-----");
+        System.out.println("Account Number: " + acno);
+        System.out.println("Balance: " + balance);
+        System.out.println("Interest Rate: " + calculateInterest());
+        System.out.println("Overdraft Amount: " + displayOverdraftAmount());
     }
 }
 
-class RegularCustomer extends Customer {
-    RegularCustomer(String customerId, String name, String phoneNumber) {
-        super(customerId, name, phoneNumber);
+class SavingsAccount extends Account {
+    SavingsAccount(String acno) {
+        super(acno);
     }
 
-    @Override
-    float getCreditLimit() {
-        return 50000;
+    float calculateInterest() {
+        return 5.8f;
     }
+
+    void displayAccountDetails() {
+        System.out.println("-----Savings Account Details-----");
+        System.out.println("Account Number: " + acno);
+        System.out.println("Balance: " + balance);
+        System.out.println("Interest Rate: " + calculateInterest());
+    }
+
 }
-
-class PrivilegedCustomer extends Customer {
-    PrivilegedCustomer(String customerId, String name, String phoneNumber) {
-        super(customerId, name, phoneNumber);
-    }
-
-    @Override
-    float getCreditLimit() {
-        return 100000;
-    }
-}
-
 public class Bank {
-    private HashMap<String, Customer> customers;
+    Account accounts[];
+    int count;
 
     Bank() {
-        customers = new HashMap<>();
+        accounts=new Account[100];
+        count=0;
     }
 
-    // Add new customer
-    public void addCustomer(String customerId, String name, String phoneNumber, boolean isPrivileged) {
-        if (customers.containsKey(customerId)) {
-            System.out.println("Customer ID already exists.");
+    boolean accountExists(String acno) {
+        for (int i=0; i<count; i++) {
+            if (accounts[i].acno.equals(acno)) 
+                return true;
+        }
+        return false;
+    }
+
+    void displayAllAccounts() {
+
+        if (count==0) {
+            System.out.println("No accounts to display.");
             return;
         }
 
-        Customer customer;
-        if (isPrivileged) {
-            customer = new PrivilegedCustomer(customerId, name, phoneNumber);
+        for (int i=0; i<count; i++) {
+            accounts[i].displayAccountDetails();
+        }
+    }
+
+    void addAccount(Scanner sc) {
+        System.out.println("Enter type of Account - Savings(s) or Current(c) : ");
+        char ch=sc.next().charAt(0);
+        System.out.println("Enter Account Number: ");
+        String acno=sc.next();
+
+        System.out.println("Enter initial balance: ");
+        float balance=sc.nextFloat();
+
+        if (accountExists(acno)) {
+            System.out.println("Account already exists.");
+            return;
+        }
+
+        if (ch=='s') {
+            accounts[count]=new SavingsAccount(acno);
+            accounts[count].balance=balance;
+        } else if (ch=='c') {
+            accounts[count]=new CurrentAccount(acno);
+            accounts[count].balance=balance;
+        }
+        count++;
+    }
+
+    void addBalance(String acno, float amount) {
+        if (accountExists(acno)) {
+            for (int i=0; i<count; i++) {
+                if (accounts[i].acno.equals(acno)) {
+                    accounts[i].balance+=amount;
+                    System.out.println("Balance added successfully.");
+                    return;
+                }
+            }
         } else {
-            customer = new RegularCustomer(customerId, name, phoneNumber);
-        }
-        customers.put(customerId, customer);
-        System.out.println("Customer added successfully.");
-    }
-
-    // Find customer
-    public Customer findCustomer(String customerId) {
-        if (!customers.containsKey(customerId)) {
-            System.out.println("Customer not found.");
-            return null;
-        }
-        return customers.get(customerId);
-    }
-
-    // Update customer name
-    public void updateName(String customerId, String newName) {
-        Customer customer = findCustomer(customerId);
-        if (customer != null) {
-            customer.setName(newName);
-        }
-    }
-
-    // Update customer phone
-    public void updatePhoneNumber(String customerId, String newPhone) {
-        Customer customer = findCustomer(customerId);
-        if (customer != null) {
-            customer.setPhoneNumber(newPhone);
-        }
-    }
-
-    // Request loan
-    public void requestLoan(String customerId, float loanAmount) {
-        Customer customer = findCustomer(customerId);
-        if (customer != null) {
-            customer.requestLoan(loanAmount);
-        }
-    }
-
-    // Display all customers
-    public void displayAllCustomers() {
-        if (customers.isEmpty()) {
-            System.out.println("No customers found.");
-            return;
-        }
-        for (Customer customer : customers.values()) {
-            customer.displayDetails();
-        }
-    }
-
-    // Display customer info
-    public void displayCustomerInfo(String customerId) {
-        Customer customer = findCustomer(customerId);
-        if (customer != null) {
-            customer.displayDetails();
+            System.out.println("Account does not exist.");
         }
     }
 
     public static void main(String[] args) {
-        System.out.println("===== Bank Customer Management System =====\n");
-        Bank bank = new Bank();
-        Scanner sc = new Scanner(System.in);
-        boolean running = true;
 
-        while (running) {
-            System.out.println("\n----- Menu -----");
-            System.out.println("1. Add Customer");
-            System.out.println("2. View Customer Details");
-            System.out.println("3. Update Customer Name");
-            System.out.println("4. Update Phone Number");
-            System.out.println("5. Request Loan");
-            System.out.println("6. Display All Customers");
-            System.out.println("7. Exit");
-            System.out.print("Enter your choice: ");
+        System.out.println("Banking System");
+        Bank bank=new Bank();
+        Scanner sc=new Scanner(System.in);
+        
+        while (true) {
+            int choice;
+            System.out.println("1. Add Account \t 2. Display All Accounts \t 3. Check Account Existence \t 4. Add Balance \t 5. Exit");
 
-            int choice = sc.nextInt();
-            sc.nextLine(); // Consume newline
-
-            switch (choice) {
+            switch (choice = sc.nextInt()) {
                 case 1:
-                    System.out.print("Enter Customer ID: ");
-                    String custId = sc.nextLine();
-                    System.out.print("Enter Name: ");
-                    String name = sc.nextLine();
-                    System.out.print("Enter Phone Number: ");
-                    String phone = sc.nextLine();
-                    System.out.print("Is Privileged Customer? (y/n): ");
-                    boolean isPrivileged = sc.nextLine().equalsIgnoreCase("y");
-                    bank.addCustomer(custId, name, phone, isPrivileged);
+                    bank.addAccount(sc);
                     break;
-
                 case 2:
-                    System.out.print("Enter Customer ID: ");
-                    String searchId = sc.nextLine();
-                    bank.displayCustomerInfo(searchId);
+                    bank.displayAllAccounts();
                     break;
-
                 case 3:
-                    System.out.print("Enter Customer ID: ");
-                    String updateCustId = sc.nextLine();
-                    System.out.print("Enter New Name: ");
-                    String newName = sc.nextLine();
-                    bank.updateName(updateCustId, newName);
+                    System.out.println("Enter Account Number to check existence: ");
+                    String acno = sc.next();
+                    if (bank.accountExists(acno)) {
+                        System.out.println("Account exists.");
+                    } else {
+                        System.out.println("Account does not exist.");
+                    }
                     break;
-
                 case 4:
-                    System.out.print("Enter Customer ID: ");
-                    String phoneUpdateId = sc.nextLine();
-                    System.out.print("Enter New Phone Number: ");
-                    String newPhone = sc.nextLine();
-                    bank.updatePhoneNumber(phoneUpdateId, newPhone);
+                    System.out.println("Enter Account Number to add balance: ");
+                    String accno = sc.next();
+                    System.out.println("Enter amount to add: ");
+                    float amount = sc.nextFloat();
+                    bank.addBalance(accno, amount);
                     break;
-
                 case 5:
-                    System.out.print("Enter Customer ID: ");
-                    String loanCustId = sc.nextLine();
-                    System.out.print("Enter Loan Amount: ");
-                    float loanAmount = sc.nextFloat();
-                    sc.nextLine(); // Consume newline
-                    bank.requestLoan(loanCustId, loanAmount);
-                    break;
-
-                case 6:
-                    bank.displayAllCustomers();
-                    break;
-
-                case 7:
-                    System.out.println("Thank you for using Bank Customer Management System. Goodbye!");
-                    running = false;
-                    break;
-
+                    System.out.println("Exiting Banking System.");
+                    sc.close();
+                    return; 
+            
                 default:
-                    System.out.println("Invalid choice. Please try again.");
+                    break;
             }
         }
-        sc.close();
     }
 }

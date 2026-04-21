@@ -1,41 +1,49 @@
-package JAVACLG.Assignment1;
+// 2. Write a program that accepts radius of a circle and displays area of the circle. Overload the 
+// constructor to accept radius as input and another circle object as input. Then show the effect of 
+// shallow vs deep copy of objects. Declare a constant pi equals to 3.14 using OOP concept.
+// Name: Prosenjit Hawlader
+// Roll No: 002410501066
 
-class Circle{
-        static final double PI = 3.14;
-        double radius;
-        Circle(){
-            radius = 5;
-        }
-        Circle(double r){
-            radius = r;
-        }
-        Circle(Circle c){
-            radius = c.radius;
-        }
+import java.util.Scanner;
 
-        double calArea(){
-            return PI*radius*radius;
-        }
-        
+public class Circle {
+    static final double PI=3.14;
+    double radius;
+
+    Circle(double radius) {
+        this.radius=radius;
+    }
+
+    Circle (Circle c1) {
+        this.radius=c1.radius;       
+    }
+
+    double calculateArea() {
+        return PI*radius*radius;
+    }
+
     public static void main(String[] args) {
-        Circle c1,c2,c3,c4;
-        c1 = new Circle(2);
-        c2 = c1;// Shallow copy
-        System.out.println("The area of c1 is : " +c1.calArea());
-        System.out.println("The area of c2 is : " +c2.calArea());
-        c1.radius = 3;
-        System.out.println("The area of c1 is : " +c1.calArea());
-        System.out.println("The area of c2 is : " +c2.calArea());
+        System.out.println("Enter radius of circle:");
+        Scanner sc=new Scanner(System.in);
+        double r=sc.nextDouble();
+        Circle c1=new Circle(r);
+        System.out.println("Area of circle with radius "+c1.radius+" is: "+c1.calculateArea());
 
-        c3 = new Circle(2);
-        c4 = new Circle(c3);// Deep copy
+        Circle c3=c1;
+        System.out.println("Shallow copy: ");
+        System.out.println("Area of circle with radius "+c3.radius+" is: "+c3.calculateArea());
+        c1.radius=10; // modifying radius of original object
+        System.out.println("After modifying radius of original object:");
+        System.out.println("Area of circle c3 with radius "+c3.radius+" is: "+c3.calculateArea());
 
-        System.out.println("The area of c3 is : " +c3.calArea());
-        System.out.println("The area of c4 is : " +c4.calArea());
-        c3.radius = 3;
-        System.out.println("The area of c3 is : " +c3.calArea());
-        System.out.println("The area of c4 is : " +c4.calArea());
 
+        Circle c2=new Circle(c1); // using copy constructor
+        System.out.println("Deep copy: ");
+        System.out.println("Area of circle with radius "+c2.radius+" is: "+c2.calculateArea());
+        c1.radius=15; // modifying radius of original object
+        System.out.println("After modifying radius of original object:");
+        System.out.println("Area of circle c2 with radius "+c2.radius+" is: "+c2.calculateArea());
+
+        sc.close();
     }
 }
-
