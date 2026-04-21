@@ -8,3 +8,18 @@
 /dataSources.local.xml
 # Editor-based HTTP Client requests
 /httpRequests/
+# Compiled Java class files
+*.class
+
+# Logs
+*.log
+
+# IDE files (optional but recommended)
+.idea/
+*.iml
+.vscode/
+
+# Build folders (if any)
+bin/
+out/
+target/
